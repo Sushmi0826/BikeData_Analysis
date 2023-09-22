@@ -1,0 +1,267 @@
+ANALYSIS BASED ON YEAR & Time:
+--------------------------------
+scala> val avgTripDurationByTimeOfDay = spark.sql("select start_date, HOUR(start_time) AS hour, AVG(tripduration) AS avg from bike group by HOUR(start_time)
+ ,start_date order by hour").show
++----------+----+------------------+
+|start_date|hour|               avg|
++----------+----+------------------+
+|2015-05-30|   8|11.848101280912568|
+|2016-05-30|   8|12.566666762034098|
+|2017-09-17|   8|10.285167449969425|
+|2016-07-15|   8|11.622591378284847|
+|2015-05-30|   9|10.748524597042897|
+|2017-09-17|   9|10.421107269075915|
+|2016-07-15|   9|12.245161294937134|
+|2015-05-30|  10|10.392592584645307|
+|2014-05-30|  10|11.934177217604239|
+|2014-05-30|  11|11.837890611030161|
+|2014-05-30|  12|11.098591586233864|
+|2014-06-30|  23|2.0999999046325684|
++----------+----+------------------+
+
+scala> val avgDurationByYear = spark.sql("select year, round(AVG(tripduration),2) AS avg_duration from bike group by year order by year").show()
++----+------------+
+|year|avg_duration|
++----+------------+
+|2014|       10.85|
+|2015|       10.87|
+|2016|       11.36|
+|2017|       11.86|
++----+------------+
+
+
+scala> val year_gender = spark.sql("SELECT year, COUNT(gender) as count, gender FROM bike GROUP BY year, gender ORDER BY year").show()
++----+-----+------+
+|year|count|gender|
++----+-----+------+
+|2014|  371|  Male|
+|2014|  107|Female|
+|2015|  365|  Male|
+|2015|  127|Female|
+|2016|  358|  Male|
+|2016|  132|Female|
+|2017|  399|  Male|
+|2017|   99|Female|
++----+-----+------+
+
+
+scala> val year = spark.sql("SELECT year, COUNT(*) as count FROM bike GROUP BY year ORDER BY year").show()
++----+-----+
+|year|count|
++----+-----+
+|2014|  478|
+|2015|  492|
+|2016|  490|
+|2017|  498|
++----+-----+
+
+
+scala> val peakUsageTimes = spark.sql("SELECT hour as hour_of_day, week as day_of_week,COUNT(*) as ride_count FROM bike GROUP BY hour_of_day, day_of_week ORDER BY day_of_week,hour_of_day").show
++-----------+-----------+----------+
+|hour_of_day|day_of_week|ride_count|
++-----------+-----------+----------+
+|          8|         22|        82|
+|          9|         22|       305|
+|         10|         22|       187|
+|         11|         22|       256|
+|         12|         22|       142|
+|         23|         27|         1|
+|          8|         29|       301|
+|          9|         29|       186|
+|          8|         38|       209|
+|          9|         38|       289|
++-----------+-----------+----------+
+
+peakUsageTimes: Unit = ()
+
+
+ANALYSIS BASED ON STATION:
+--------------------------
+
+scala> val start_st = spark.sql("""SELECT from_station_name, from_station_id, COUNT(*) as count FROM bike GROUP BY from_station_name, from_station_id ORDER
+BY count DESC""").show()
++--------------------+---------------+-----+
+|   from_station_name|from_station_id|count|
++--------------------+---------------+-----+
+|Clinton St & Wash...|             91|   76|
+|Canal St & Madiso...|            174|   40|
+| Canal St & Adams St|            192|   39|
+|Canal St & Jackso...|             75|   33|
+|Franklin St & Arc...|            287|   27|
+|Clinton St & Madi...|             77|   24|
+|Dearborn St & Mon...|             49|   23|
+|Orleans St & Merc...|            100|   23|
+|Peoria St & Jacks...|            134|   22|
+|Columbus Dr & Ran...|            195|   22|
+|Larrabee St & Kin...|             48|   22|
+|  Daley Center Plaza|             81|   21|
+|Clinton St & Lake St|             66|   20|
+|Canal St & Monroe St|            191|   20|
+|LaSalle St & Wash...|             98|   19|
+|   Clark St & Elm St|            176|   19|
+|Jefferson St & Mo...|             73|   18|
+|State St & Kinzie St|             47|   18|
+|Franklin St & Qui...|            286|   18|
+|Indiana Ave & Roo...|            255|   18|
++--------------------+---------------+-----+
+only showing top 20 rows
+start_st: Unit = ()
+
+scala> val end_st = spark.sql("""SELECT to_station_name, to_station_id, COUNT(*) as count FROM bike GROUP BY to_station_name, to_station_id ORDER BY count DESC""").show()
++--------------------+-------------+-----+
+|     to_station_name|to_station_id|count|
++--------------------+-------------+-----+
+|Franklin St & Arc...|          287|   65|
+|Dearborn St & Mon...|           49|   52|
+|Michigan Ave & Wa...|           43|   50|
+|Dearborn St & Ada...|           37|   44|
+|Larrabee St & Kin...|           48|   39|
+|  Daley Center Plaza|           81|   37|
+|LaSalle St & Jack...|          283|   36|
+|Franklin St & Jac...|           36|   32|
+|Clinton St & Wash...|           91|   31|
+|Wells St & Hubbar...|          212|   28|
+|Orleans St & Merc...|          100|   28|
+|LaSalle St & Wash...|           98|   28|
+|  Wells St & Erie St|           53|   27|
+|Michigan Ave & La...|           52|   26|
+|Clinton St & Lake St|           66|   24|
+|Michigan Ave & Oa...|           85|   24|
+|Franklin St & Qui...|          286|   24|
+|Clark St & Randol...|           51|   22|
+|Canal St & Jackso...|           75|   21|
+|Franklin St & Lak...|          164|   21|
++--------------------+-------------+-----+
+only showing top 20 rows
+
+scala> val avg_dur = spark.sql("SELECT from_station_id, AVG(tripduration) AS avg_duration FROM bike GROUP BY from_station_id ORDER BY avg_duration DESC").show
++---------------+------------------+
+|from_station_id|      avg_duration|
++---------------+------------------+
+|            167|27.200000762939453|
+|            203|25.399999618530273|
+|            183|24.233332951863606|
+|            202|23.699999809265137|
+|            258|23.200000762939453|
+|            272|22.600000381469727|
+|            116|              22.5|
+|            228|22.299999237060547|
+|            279|             22.25|
+|            213|21.700000762939453|
+|            315|20.799999237060547|
+|            268|20.487500071525574|
+|            216|19.850000381469727|
+|            239| 19.53333346048991|
+|            299| 19.34999990463257|
+|            160| 19.30000009536743|
+|            127|19.299999713897705|
+|            350|19.299999713897705|
+|             27|19.079999923706055|
+|            244|18.600000381469727|
++---------------+------------------+
+only showing top 20 rows
+
+scala> val avg_dur = spark.sql("SELECT to_station_id, AVG(tripduration) AS avg_duration FROM bike GROUP BY to_station_id ORDER BY avg_duration DESC").show
++-------------+------------------+
+|to_station_id|      avg_duration|
++-------------+------------------+
+|          298|              28.0|
+|          347|              25.0|
+|          183|              24.5|
+|           28|24.200000762939453|
+|          311|              23.0|
+|          333|22.700000762939453|
+|          329|22.550000190734863|
+|          299|              22.5|
+|           61| 21.96666685740153|
+|          254|              21.5|
+|          294| 21.40000009536743|
+|           22|21.100000381469727|
+|           27|20.399999618530273|
+|          242|19.449999809265137|
+|          150|19.299999237060547|
+|          341|            19.125|
+|          239| 18.90000009536743|
+|          300|              18.5|
+|          201|18.399999618530273|
+|          166| 17.84999990463257|
++-------------+------------------+
+only showing top 20 rows
+
+
+
+scala>  val total_trips = spark.sql("SELECT from_station_id, to_station_id, COUNT(*) AS total_trips FROM bike GROUP BY from_station_id, to_station_id ORDER BY total_trips DESC").show
++---------------+-------------+-----------+
+|from_station_id|to_station_id|total_trips|
++---------------+-------------+-----------+
+|             91|           52|          6|
+|             91|           81|          6|
+|            174|           43|          5|
+|             43|          287|          5|
+|            334|           85|          5|
+|             91|           43|          5|
+|             36|           43|          5|
+|            192|           43|          5|
+|             91|          217|          4|
+|            192|           49|          4|
+|             87|           48|          4|
+|            191|           43|          4|
+|             91|           49|          4|
+|            287|           43|          4|
+|            255|          284|          3|
+|             75|          283|          3|
+|             91|           53|          3|
+|            284|          341|          3|
+|            211|           49|          3|
+|            211|           77|          3|
++---------------+-------------+-----------+
+only showing top 20 rows
+
+
+ANALYSIS BASED ON USER:
+--------------------------
+
+scala> val gender = spark.sql("select gender, count(*) as count from bike group by gender").show()
++------+-----+
+|gender|count|
++------+-----+
+|Female|  465|
+|  Male| 1493|
++------+-----+
+
+scala> val trip_gender = spark.sql("SELECT gender, AVG(tripduration) AS avg_duration FROM bike GROUP BY gender").show()
++------+------------------+
+|gender|      avg_duration|
++------+------------------+
+|Female|12.717634411781065|
+|  Male|  10.6827863406113|
++------+------------------+
+
+scala> val year_gender = spark.sql("SELECT year, COUNT(gender) as count, gender FROM bike GROUP BY year, gender ORDER BY year").show()
++----+-----+------+
+|year|count|gender|
++----+-----+------+
+|2014|  371|  Male|
+|2014|  107|Female|
+|2015|  365|  Male|
+|2015|  127|Female|
+|2016|  358|  Male|
+|2016|  132|Female|
+|2017|  399|  Male|
+|2017|   99|Female|
++----+-----+------+
+
+scala> val avgDurationByYr_gen = spark.sql("select year, gender, round(AVG(tripduration),2) AS avg_duration from bike group by year, gender order by year").
+show()
++----+------+------------+
+|year|gender|avg_duration|
++----+------+------------+
+|2014|  Male|       11.24|
+|2014|Female|       12.91|
+|2015|  Male|       10.22|
+|2015|Female|       12.66|
+|2016|  Male|       11.28|
+|2016|Female|       13.44|
+|2017|  Male|       10.05|
+|2017|Female|       11.62|
++----+------+------------+
