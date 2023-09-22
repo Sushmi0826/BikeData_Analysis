@@ -1,0 +1,125 @@
+Load data:
+
+scala> val bikedf = spark.sql("select * from bike.bikedata")
+bikedf: org.apache.spark.sql.DataFrame = [trip_id: int, year: int ... 21 more fields]
+
+DATA PREPROCESSING:
+------------------
+scala> val cnt = bikedf.count()
+scala> println(s"Count: $cnt")
+Count: 1999
+
+DATA CLEANING:
+DATA DEDUPLICATION:
+-------------------
+scala> val cleanedDF = bikedf.dropDuplicates()
+cleanedDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] = [trip_id: int, year: int ... 21 more fields]
+
+scala> val numRows = cleanedDF.count()
+numRows: Long = 1999
+
+scala> val numCols = cleanedDF.columns.length
+numCols: Int = 23
+
+CHECKING NULL VALUES:
+---------------------
+scala> val nullCounts = bikedf.select(bikedf.columns.map(c => sum(col(c).isNull.cast("int")).alias(c)): _*)
+nullCounts: org.apache.spark.sql.DataFrame = [trip_id: bigint, year: bigint ... 21 more fields]
+
+scala> nullCounts.show()
++-------+----+-----+----+---+----+--------+------+---------+--------+------------+-----------+------+---------------+-----------------+--------------+---------------+----------------+-------------+---------------+------------+-------------+--------------+
+|trip_id|year|month|week|day|hour|usertype|gender|starttime|stoptime|tripduration|temperature|events|from_station_id|from_station_name|latitude_start|longitude_start|dpcapacity_start|to_station_id|to_station_name|latitude_end|longitude_end|dpcapacity_end|
++-------+----+-----+----+---+----+--------+------+---------+--------+------------+-----------+------+---------------+-----------------+--------------+---------------+----------------+-------------+---------------+------------+-------------+--------------+
+|      0|   0|    0|   0|  0|   0|       0|     0|        0|       0|           0|          0|     0|              0|                0|             0|              0|               0|            0|              0|           0|            0|             0|
++-------+----+-----+----+---+----+--------+------+---------+--------+------------+-----------+------+---------------+-----------------+--------------+---------------+----------------+-------------+---------------+------------+-------------+--------------
+
+DROPPING OUTLIERS:
+------------------
+
+scala> :paste
+// Entering paste mode (ctrl-D to finish)
+
+val quantiles = bikedf.selectExpr(s"percentile_approx(tripduration, 0.25) as Q1", s"percentile_approx(tripduration, 0.75) as Q3").first()
+val Q1 = Option(quantiles.getAs[Float]("Q1")).map(_.toDouble).getOrElse(0.0)
+val Q3 = Option(quantiles.getAs[Float]("Q3")).map(_.toDouble).getOrElse(0.0)
+val IQR = Q3 - Q1
+val lowerBound = Q1 - 1.5 * IQR
+val upperBound = Q3 + 1.5 * IQR
+val filteredData = bikedf.filter(col("tripduration").between(lowerBound, upperBound))
+
+// Exiting paste mode, now interpreting.
+
+quantiles: org.apache.spark.sql.Row = [6.4,15.3]
+Q1: Double = 6.400000095367432
+Q3: Double = 15.300000190734863
+IQR: Double = 8.900000095367432
+lowerBound: Double = -6.950000047683716
+upperBound: Double = 28.65000033378601
+filteredData: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] = [trip_id: int, year: int ... 21 more fields]
+
+scala> filteredData.count()
+res3: Long = 1960
+
+DATA MANIPULATION:
+------------------
+
+scala> :paste
+// Entering paste mode (ctrl-D to finish)
+
+val starttime = filteredData.withColumn("time", date_format(col("starttime"), "HH:mm:ss"))
+val stoptime = filteredData.withColumn("end_time",date_format(col("stoptime"),"HH:mm:ss"))
+val filteredDataWithStartTime = filteredData.withColumn("start_time", date_format(col("starttime"), "HH:mm:ss"))
+val filteredDataWithStartAndStopTime = filteredDataWithStartTime.withColumn("end_time", date_format(col("stoptime"), "HH:mm:ss"))
+
+
+filteredDataWithStartAndStopTime: org.apache.spark.sql.DataFrame = [trip_id: int, year: int ... 23 more fields]
+
+
+scala> :paste
+// Entering paste mode (ctrl-D to finish)
+
+val dfwithstartdate = filteredDataWithStartAndStopTime.withColumn("start_date", to_date(col("starttime")))
+val dfwithstart_enddate = dfwithstartdate.withColumn("end_date", to_date(col("stoptime")))
+
+dfwithstart_enddate: org.apache.spark.sql.DataFrame = [trip_id: int, year: int ... 25 more fields]
+
+
+DATA CONSISTENCY:
+-----------------
+
+val consistentDate = dfwithstart_enddate.filter(col("start_date").geq(col("end_date")))
+val con_datecnt = consistentDate.count()
+
+consistentDate: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] = [trip_id: int, year: int ... 25 more fields]
+con_datecnt: Long = 1958
+
+scala> val finaldf = consistentDate
+
+
+DESCRIPTIVE STATISTICS:
+------------------------
+
+scala> val summaryStatistics = finaldf.describe("tripduration", "temperature")
+
+scala> summaryStatistics.show()
++-------+------------------+-----------------+
+|summary|      tripduration|      temperature|
++-------+------------------+-----------------+
+|  count|              1958|             1958|
+|   mean|11.166036776307898|66.81409601634321|
+| stddev| 6.008374815798006|8.249319228348172|
+|    min|               2.0|             56.0|
+|    max|              28.6|             78.0|
++-------+------------------+-----------------+
+
+
+DIMENSION REDUCTION:
+---------------------
+
+scala> val ProcessedData = finaldf.drop ("starttime", "stoptime")
+
+
+Transfer a data from spark to hive:
+ProcessedData.write
+             .mode("overwrite") // Choose the appropriate mode
+             .saveAsTable("bike.final_bikedata")
