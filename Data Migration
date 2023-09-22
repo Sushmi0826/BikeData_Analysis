@@ -1,0 +1,135 @@
+hadoop@DESKTOP-EBUJP1M:~$ sqoop import --connect jdbc:mysql://localhost/bike --username root -P --table bikesharingdata --target-dir /bikedata -m 3
+Warning: /home/hadoop/sqoop-1.4.7/../hbase does not exist! HBase imports will fail.
+Please set $HBASE_HOME to the root of your HBase installation.
+Warning: /home/hadoop/sqoop-1.4.7/../hcatalog does not exist! HCatalog jobs will fail.
+Please set $HCAT_HOME to the root of your HCatalog installation.
+Warning: /home/hadoop/sqoop-1.4.7/../accumulo does not exist! Accumulo imports will fail.
+Please set $ACCUMULO_HOME to the root of your Accumulo installation.
+Warning: /home/hadoop/sqoop-1.4.7/../zookeeper does not exist! Accumulo imports will fail.
+Please set $ZOOKEEPER_HOME to the root of your Zookeeper installation.
+2023-09-18 20:10:33,509 INFO sqoop.Sqoop: Running Sqoop version: 1.4.7
+Enter password:
+2023-09-18 20:10:42,404 INFO manager.MySQLManager: Preparing to use a MySQL streaming resultset.
+2023-09-18 20:10:42,404 INFO tool.CodeGenTool: Beginning code generation
+Loading class `com.mysql.jdbc.Driver'. This is deprecated. The new driver class is `com.mysql.cj.jdbc.Driver'. The driver is automatically registered via the SPI and manual loading of the driver class is generally unnecessary.
+2023-09-18 20:10:42,925 INFO manager.SqlManager: Executing SQL statement: SELECT t.* FROM `bikesharingdata` AS t LIMIT 1
+2023-09-18 20:10:42,971 INFO manager.SqlManager: Executing SQL statement: SELECT t.* FROM `bikesharingdata` AS t LIMIT 1
+2023-09-18 20:10:42,984 INFO orm.CompilationManager: HADOOP_MAPRED_HOME is /home/hadoop/hadoop
+Note: /tmp/sqoop-hadoop/compile/28b8d5ea1a287c4de3def59761cde31b/bikesharingdata.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+2023-09-18 20:10:45,325 INFO orm.CompilationManager: Writing jar file: /tmp/sqoop-hadoop/compile/28b8d5ea1a287c4de3def59761cde31b/bikesharingdata.jar
+2023-09-18 20:10:45,345 WARN manager.MySQLManager: It looks like you are importing from mysql.
+2023-09-18 20:10:45,345 WARN manager.MySQLManager: This transfer can be faster! Use the --direct
+2023-09-18 20:10:45,345 WARN manager.MySQLManager: option to exercise a MySQL-specific fast path.
+2023-09-18 20:10:45,345 INFO manager.MySQLManager: Setting zero DATETIME behavior to convertToNull (mysql)
+2023-09-18 20:10:45,352 INFO mapreduce.ImportJobBase: Beginning import of bikesharingdata
+2023-09-18 20:10:45,353 INFO Configuration.deprecation: mapred.job.tracker is deprecated. Instead, use mapreduce.jobtracker.address
+2023-09-18 20:10:45,696 INFO Configuration.deprecation: mapred.jar is deprecated. Instead, use mapreduce.job.jar
+2023-09-18 20:10:46,284 INFO Configuration.deprecation: mapred.map.tasks is deprecated. Instead, use mapreduce.job.maps
+2023-09-18 20:10:46,393 INFO client.DefaultNoHARMFailoverProxyProvider: Connecting to ResourceManager at localhost/127.0.0.1:8032
+2023-09-18 20:10:47,076 INFO mapreduce.JobResourceUploader: Disabling Erasure Coding for path: /tmp/hadoop-yarn/staging/hadoop/.staging/job_1695047762937_0001
+2023-09-18 20:10:48,728 INFO db.DBInputFormat: Using read commited transaction isolation
+2023-09-18 20:10:48,729 INFO db.DataDrivenDBInputFormat: BoundingValsQuery: SELECT MIN(`trip_id`), MAX(`trip_id`) FROM `bikesharingdata`
+2023-09-18 20:10:48,732 INFO db.IntegerSplitter: Split size: 581524; Num splits: 3 from: 1873697 to: 3618270
+2023-09-18 20:10:49,224 INFO mapreduce.JobSubmitter: number of splits:3
+2023-09-18 20:10:49,371 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_1695047762937_0001
+2023-09-18 20:10:49,372 INFO mapreduce.JobSubmitter: Executing with tokens: []
+2023-09-18 20:10:49,607 INFO conf.Configuration: resource-types.xml not found
+2023-09-18 20:10:49,608 INFO resource.ResourceUtils: Unable to find 'resource-types.xml'.
+2023-09-18 20:10:49,965 INFO impl.YarnClientImpl: Submitted application application_1695047762937_0001
+2023-09-18 20:10:50,030 INFO mapreduce.Job: The url to track the job: http://DESKTOP-EBUJP1M.:8088/proxy/application_1695047762937_0001/
+2023-09-18 20:10:50,031 INFO mapreduce.Job: Running job: job_1695047762937_0001
+2023-09-18 20:11:00,189 INFO mapreduce.Job: Job job_1695047762937_0001 running in uber mode : false
+2023-09-18 20:11:00,190 INFO mapreduce.Job:  map 0% reduce 0%
+2023-09-18 20:11:08,320 INFO mapreduce.Job:  map 33% reduce 0%
+2023-09-18 20:11:09,326 INFO mapreduce.Job:  map 67% reduce 0%
+2023-09-18 20:11:10,341 INFO mapreduce.Job:  map 100% reduce 0%
+2023-09-18 20:11:11,364 INFO mapreduce.Job: Job job_1695047762937_0001 completed successfully
+2023-09-18 20:11:11,524 INFO mapreduce.Job: Counters: 33
+        File System Counters
+                FILE: Number of bytes read=0
+                FILE: Number of bytes written=845016
+                FILE: Number of read operations=0
+                FILE: Number of large read operations=0
+                FILE: Number of write operations=0
+                HDFS: Number of bytes read=361
+                HDFS: Number of bytes written=404118
+                HDFS: Number of read operations=18
+                HDFS: Number of large read operations=0
+                HDFS: Number of write operations=6
+                HDFS: Number of bytes read erasure-coded=0
+        Job Counters
+                Launched map tasks=3
+                Other local map tasks=3
+                Total time spent by all maps in occupied slots (ms)=19518
+                Total time spent by all reduces in occupied slots (ms)=0
+                Total time spent by all map tasks (ms)=19518
+                Total vcore-milliseconds taken by all map tasks=19518
+                Total megabyte-milliseconds taken by all map tasks=19986432
+        Map-Reduce Framework
+                Map input records=1999
+                Map output records=1999
+                Input split bytes=361
+                Spilled Records=0
+                Failed Shuffles=0
+                Merged Map outputs=0
+                GC time elapsed (ms)=835
+                CPU time spent (ms)=8060
+                Physical memory (bytes) snapshot=747941888
+                Virtual memory (bytes) snapshot=7658643456
+                Total committed heap usage (bytes)=623902720
+                Peak Map Physical memory (bytes)=254767104
+                Peak Map Virtual memory (bytes)=2554413056
+        File Input Format Counters
+                Bytes Read=0
+        File Output Format Counters
+                Bytes Written=404118
+2023-09-18 20:11:11,530 INFO mapreduce.ImportJobBase: Transferred 394.6465 KB in 25.2367 seconds (15.6378 KB/sec)
+2023-09-18 20:11:11,533 INFO mapreduce.ImportJobBase: Retrieved 1999 records.
+
+
+hadoop@DESKTOP-EBUJP1M:~$ hadoop fs -ls /bikedata
+Found 4 items
+-rw-r--r--   1 hadoop supergroup          0 2023-09-18 20:11 /bikedata/_SUCCESS
+-rw-r--r--   1 hadoop supergroup     202583 2023-09-18 20:11 /bikedata/part-m-00000
+-rw-r--r--   1 hadoop supergroup     100704 2023-09-18 20:11 /bikedata/part-m-00001
+-rw-r--r--   1 hadoop supergroup     100831 2023-09-18 20:11 /bikedata/part-m-00002
+
+
+
+HIVE:
+
+hive> create table bikedata (trip_id int, year int,month int, week int,day int, hour int, usertype string, gender string,starttime timestamp, stoptime timestamp,tripduration float, temperature float, events string, from_station_id int, from_station_name string,latitude_start float, longitude_start float,  dpcapacity_start int , to_station_id int, to_station_name string, latitude_end float, longitude_end float, dpcapacity_end int)
+    > ROW FORMAT DELIMITED
+    > FIELDS TERMINATED BY ','
+    > STORED AS TEXTFILE
+    > TBLPROPERTIES ('skip.header.line.count' = '1');
+OK
+Time taken: 0.527 seconds
+hive> load data inpath '/bikedata/part-m-00000' into table bikedata;
+Loading data to table bike.bikedata
+OK
+Time taken: 2.378 seconds
+
+hive> load data inpath '/bikedata/part-m-00001' into table bikedata;
+Loading data to table bike.bikedata
+OK
+Time taken: 1.297 seconds
+hive> load data inpath '/bikedata/part-m-00002' into table bikedata;
+Loading data to table bike.bikedata
+OK
+Time taken: 1.394 seconds
+hive> select * from bikedata limit 10;
+OK
+1873698 2016    5       22      4       8       Subscriber      Male    2016-05-30 08:52:00     2016-05-30 08:59:00     6.6     68.0    cloudy  134     Peoria St & Jackson Blvd    41.88   -87.65  19      66      Clinton St & Lake St    41.89   -87.64  19
+1873701 2016    5       22      4       8       Subscriber      Male    2016-05-30 08:52:00     2016-05-30 09:07:00     14.6    68.0    cloudy  113     Bissell St & Armitage Ave   41.92   -87.65  15      74      Kingsbury St & Erie St  41.89   -87.64  23
+1873704 2015    5       22      4       8       Subscriber      Male    2015-05-30 08:53:00     2015-05-30 09:14:00     20.9    68.0    cloudy  141     Clark St & Lincoln Ave      41.92   -87.63  23      73      Jefferson St & Monroe St        41.88   -87.64  19
+1873706 2015    5       22      4       8       Subscriber      Male    2015-05-30 08:53:00     2015-05-30 09:01:00     8.2     68.0    cloudy  100     Orleans St & Merchandise Mart Plaza 41.89   -87.64  23      195     Columbus Dr & Randolph St       41.88   -87.62  31
+1873707 2015    5       22      4       8       Subscriber      Male    2015-05-30 08:53:00     2015-05-30 08:58:00     4.9     68.0    cloudy  47      State St & Kinzie St        41.89   -87.63  19      100     Orleans St & Merchandise Mart Plaza     41.89   -87.64  23
+1873711 2015    5       22      4       8       Subscriber      Male    2015-05-30 08:53:00     2015-05-30 09:10:00     17.5    68.0    cloudy  42      Wabash Ave & Cermak Rd      41.85   -87.63  15      283     LaSalle St & Jackson Blvd       41.88   -87.63  23
+1873712 2015    5       22      4       8       Subscriber      Male    2015-05-30 08:53:00     2015-05-30 09:17:00     24.1    68.0    cloudy  301     Clark St & Schiller St      41.91   -87.63  19      264     Stetson Ave & South Water St    41.89   -87.62  19
+1873713 2015    5       22      4       8       Subscriber      Female  2015-05-30 08:53:00     2015-05-30 09:08:00     15.1    68.0    cloudy  29      Noble St & Milwaukee Ave    41.9    -87.66  15      191     Canal St & Monroe St    41.88   -87.64  23
+1873714 2015    5       22      4       8       Subscriber      Male    2015-05-30 08:53:00     2015-05-30 09:22:00     29.1    68.0    cloudy  260     Kedzie Ave & Milwaukee Ave  41.93   -87.71  19      91      Clinton St & Washington Blvd    41.88   -87.64  31
+1873715 2015    5       22      4       8       Subscriber      Male    2015-05-30 08:53:00     2015-05-30 08:58:00     5.3     68.0    cloudy  21      Aberdeen St & Jackson Blvd  41.88   -87.65  15      320     Loomis St & Lexington St        41.87   -87.66  15
+Time taken: 0.208 seconds, Fetched: 10 row(s)
+
