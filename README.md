@@ -22,3 +22,12 @@ Overall architecture flow:
 
 CSV ----> MYSQL ----> HDFS ----> HIVE ----> SPARK ----> HIVE ----> POWER BI
 
+Conclusion:
+-----------
+● We can see that most of the bikes are taken from 8 to 9 AM 
+● Most trips have an average duration of 12 minutes and this has not changed through the years
+● The Clinton St & Washington Blvd(Id : 91) is very popular for pick-ups and drop-offs.
+● It has revealed a clear and positive correlation between trip distance and trip duration. This means that as the distance of a trip increases, so does the time it takes to complete it.
+● The male count is greater than the female count throughout the year for bike rides.
+
+
