@@ -1,5 +1,10 @@
 ANALYSIS BASED ON YEAR & Time:
 --------------------------------
+scala> val df = spark.sql("select * from bike.final_bikedata")
+df: org.apache.spark.sql.DataFrame = [trip_id: int, year: int ... 23 more fields]
+
+df.createOrReplaceTempView("bike")
+
 scala> val avgTripDurationByTimeOfDay = spark.sql("select start_date, HOUR(start_time) AS hour, AVG(tripduration) AS avg from bike group by HOUR(start_time)
  ,start_date order by hour").show
 +----------+----+------------------+
